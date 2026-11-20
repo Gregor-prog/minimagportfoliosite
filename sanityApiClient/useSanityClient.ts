@@ -38,7 +38,7 @@ export const fetchProfilePageText = async () => {
 
 
 export const fetchWorkPageInput = async () => {
-  const query = `*[_type == "WorkPageInput"]{heading, description, image { asset -> { _id, } }}`;
+  const query = `*[_type == "WorkPageInput"]{_id, heading, description, image { asset -> { _id, } }}`;
   const data = await sanityClient.fetch(query);
   return data;
 };

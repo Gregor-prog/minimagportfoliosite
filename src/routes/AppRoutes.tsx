@@ -7,7 +7,7 @@ import EducationPage from '../pages/aboutPages/EducationPage';
 import FellowShipScholarshipPage from '../pages/aboutPages/FellowshipScholarshipPage';
 import ManualsPage from '../pages/writingsPages/ManualsPage';
 import VideosPage from '../pages/GalleryPages/VideosPage';
-import Layout, {LayoutLoader} from './Layout';
+import Layout from './Layout';
 import AwardsPage from '../pages/aboutPages/AwardsPage';
 import PortraitsPage from '../pages/GalleryPages/PicturesPages/PortraitsPage';
 import NewsPage from '../pages/GalleryPages/NewsPage';
@@ -19,18 +19,16 @@ import TextBooksPage from '../pages/writingsPages/TextBooksPage';
 
 const router = createBrowserRouter([
   {
-    path: "/home",
-    element: <HomePage />,  
-  },
- 
-  {
     path: "/",
     element: <Layout />, 
-    loader: LayoutLoader,
     children: [
       {
         index: true,
         element: <Navigate to="/home" replace={true} />,
+      },
+      {
+        path: "home",
+        element: <HomePage />,
       },
       {
         path: "about",
@@ -70,7 +68,11 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="law-and-human-rights" replace={true} />,
+            element: <Navigate to="papers" replace={true} />,
+          },
+          {
+            path: "law-and-human-rights",
+            element: <Navigate to="/writings/papers" replace={true} />,
           },
           {
             path: "papers",
@@ -121,11 +123,11 @@ const router = createBrowserRouter([
         path: "contact",
         element: <ContactPage />,
       },
+      {
+        path: "*",
+        element: <ErrorPage />,
+      },
     ],
-  },
-  {
-    path: "*",
-    element: <ErrorPage />,
   },
 ]);
 

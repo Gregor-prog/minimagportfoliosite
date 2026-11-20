@@ -1,3 +1,5 @@
+import EditorialImage from '../../components/EditorialImage';
+import PageHeader from '../../components/PageHeader';
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchFellowshipsAndRecognitionsPageInput, fetchFellowshipsAndRecognitionsPageHeroImage } from '../../../sanityApiClient/useSanityClient';
@@ -15,7 +17,6 @@ interface FetchFellowshipsAndScholarshipsHeroImageResponse {
 
 interface FetchFellowshipsAndScholarshipsInputResponse {
   _id: string;
-  placeOfStudy: string;
   details: string[];
 }
 
@@ -25,12 +26,10 @@ interface FellowshipsAndScholarshipsPageData {
 }
 
 const fetchFellowshipsAndScholarshipsData = async (): Promise<FellowshipsAndScholarshipsPageData> => {
-  const fellowshipsAndScholarshipsHeroImage = await fetchFellowshipsAndRecognitionsPageHeroImage();
-  const fellowshipsAndScholarshipsInput = await fetchFellowshipsAndRecognitionsPageInput();
-
-  if (!fellowshipsAndScholarshipsHeroImage || fellowshipsAndScholarshipsHeroImage.length === 0) {
-    throw new Error('Hero image not found');
-  }
+  const [fellowshipsAndScholarshipsInput, fellowshipsAndScholarshipsHeroImage] = await Promise.all([
+    fetchFellowshipsAndRecognitionsPageInput(),
+    fetchFellowshipsAndRecognitionsPageHeroImage().catch(() => []),
+  ]);
   if (!fellowshipsAndScholarshipsInput || fellowshipsAndScholarshipsInput.length === 0) {
     throw new Error('Fellowships and scholarships input not found');
   }
@@ -42,7 +41,7 @@ const FellowShipScholarshipPage: React.FC = () => {
   const { authorName } = useAuthorContext();
   const displayName = authorName || 'Professor Mina Margaret Ogbanga';
 
-  const { data, isLoading } = useQuery<FellowshipsAndScholarshipsPageData>({
+  const { data, isLoading, isError } = useQuery<FellowshipsAndScholarshipsPageData>({
     queryKey: ['fellowshipsAndScholarshipsData'],
     queryFn: fetchFellowshipsAndScholarshipsData,
   });
@@ -61,29 +60,22 @@ const FellowShipScholarshipPage: React.FC = () => {
   }
 
   return (
-    <section className="py-8 md:py-12 font-sans">
-      <div className="md:w-[92%] lg:w-[88%] mx-auto px-4 md:px-6">
+    <section className="page-shell">
+      <div className="site-wrap">
         {/* Header */}
-        <header className="mb-10 pb-6 border-b border-slate-800 text-left">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs uppercase tracking-widest text-amber-400 font-semibold bg-amber-950/60 px-3 py-1 rounded-full border border-amber-500/30">
-              International Fellowships & Endowments
-            </span>
-          </div>
-          <h1 className="text-white text-3xl md:text-5xl font-bold font-serif tracking-tight">
-            Fellowships & Scholarships
-          </h1>
-          <p className="mt-2 text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed">
-            Ford Foundation Fellowships and distinguished academic research grants awarded to {displayName}.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="International Fellowships & Endowments"
+          title="Fellowships & Scholarships"
+          description={`Ford Foundation Fellowships and distinguished academic research grants awarded to ${displayName}.`}
+        />
+        {isError && <p className="mb-6 text-muted" role="status">Fellowship details could not be loaded. Please try again later.</p>}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Portrait */}
           {fellowshipsHeroImageUrl && (
             <div className="lg:col-span-5 space-y-4">
-              <div className="rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
-                <img
+              <div className="rounded overflow-hidden bg-paper border border-line">
+                <EditorialImage
                   src={fellowshipsHeroImageUrl}
                   alt={`Portrait of ${displayName}`}
                   loading="lazy"
@@ -99,21 +91,18 @@ const FellowShipScholarshipPage: React.FC = () => {
               {data?.fellowshipsAndScholarshipsInput.map((fellowship) => (
                 <div
                   key={fellowship._id}
-                  className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md shadow-xl space-y-3"
+                  className="p-6 rounded bg-paper border border-line space-y-3"
                 >
-                  <h2 className="text-lg md:text-xl font-bold text-gray-100 font-serif border-b border-slate-800/80 pb-2">
-                    {fellowship.placeOfStudy}
-                  </h2>
-                  <div className="space-y-2">
+                  <ul className="list-disc space-y-2 pl-5 marker:text-gold-ink">
                     {fellowship.details.map((detail, index) => (
-                      <p
+                      <li
                         key={index}
-                        className="text-slate-300 text-sm md:text-base font-normal leading-relaxed"
+                        className="text-muted text-sm md:text-base font-normal leading-relaxed"
                       >
                         {detail}
-                      </p>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               ))}
             </div>

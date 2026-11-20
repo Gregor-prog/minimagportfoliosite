@@ -34,20 +34,19 @@ interface AwardsPageData {
 // Main component
 const AwardsPage: React.FC = () => {
   const fetchAwardsPageData = async (): Promise<AwardsPageData> => {
-    const awardsPageInput = await fetchAwardsPageInput();
-    const awardsPageHeroImage = await fetchAwardsPageHeroImage();
+    const [awardsPageInput, awardsPageHeroImage] = await Promise.all([
+      fetchAwardsPageInput(),
+      fetchAwardsPageHeroImage().catch(() => []),
+    ]);
 
     if (!awardsPageInput || awardsPageInput.length === 0) {
       throw new Error("Awards Page input not found");
-    }
-    if (!awardsPageHeroImage || awardsPageHeroImage.length === 0) {
-      throw new Error("Hero image not found");
     }
 
     return { awardsPageInput, awardsPageHeroImage };
   };
 
-  const { data, isLoading } = useQuery<AwardsPageData>({
+  const { data, isLoading, isError } = useQuery<AwardsPageData>({
     queryKey: ["awardsPageData"], // Updated the query key to match the correct data
     queryFn: fetchAwardsPageData,
   });
@@ -69,16 +68,13 @@ const AwardsPage: React.FC = () => {
   }
 
   return (
-    <section>
-      {data && (
-        <HonorsComponent
-          title="Awards and Recognitions"
-          imgUrl={awardsPageHeroImageUrl}
-          listData={data.awardsPageInput[0]?.details || []}
-          categoryBadge="Distinctions & Accolades"
-        />
-      )}
-    </section>
+    <HonorsComponent
+      title="Awards and Recognitions"
+      imgUrl={awardsPageHeroImageUrl}
+      listData={data?.awardsPageInput[0]?.details || []}
+      categoryBadge="Distinctions & Accolades"
+      status={isError ? "Awards could not be loaded. Please try again later." : undefined}
+    />
   );
 };
 

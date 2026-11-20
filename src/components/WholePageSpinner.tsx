@@ -1,11 +1,8 @@
-import React from 'react';
-
-const WholePageSpinner: React.FC = () => {
+export default function WholePageSpinner() {
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black z-[9999]">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-gray-300"></div>
+    <div className="site-wrap flex min-h-[35vh] items-center gap-3 py-12 text-muted" role="status">
+      <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-accent" aria-hidden="true" />
+      Loading content…
     </div>
   );
-};
-
-export default WholePageSpinner;
+}

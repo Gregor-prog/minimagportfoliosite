@@ -1,3 +1,5 @@
+import EditorialImage from '../../components/EditorialImage';
+import PageHeader from '../../components/PageHeader';
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchWorkPageInput } from '../../../sanityApiClient/useSanityClient';
@@ -20,6 +22,7 @@ interface WorkPageHeading {
 }
 
 interface WorkPageResponse {
+  _id: string;
   heading: WorkPageHeading[];
   description: string;
   image: WorkPageImage;
@@ -37,7 +40,7 @@ const WorkPage: React.FC = () => {
   const { authorName } = useAuthorContext();
   const displayName = authorName || 'Professor Mina Margaret Ogbanga';
   
-  const { data = [], isLoading } = useQuery<WorkPageResponse[]>({
+  const { data = [], isLoading, isError } = useQuery<WorkPageResponse[]>({
     queryKey: ['workPageData'],
     queryFn: fetchWorkPageData,
     staleTime: 0,
@@ -52,22 +55,15 @@ const WorkPage: React.FC = () => {
   }
 
   return (
-    <section className="py-8 md:py-12 font-sans">
-      <div className="md:w-[92%] lg:w-[88%] mx-auto px-4 md:px-6">
+    <section className="page-shell">
+      <div className="site-wrap">
         {/* Header */}
-        <header className="mb-10 pb-6 border-b border-slate-800 text-left">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs uppercase tracking-widest text-emerald-400 font-semibold bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-500/30">
-              Community & Sectoral Impact
-            </span>
-          </div>
-          <h1 className="text-white text-3xl md:text-5xl font-bold font-serif tracking-tight">
-            Professional Work & Initiatives
-          </h1>
-          <p className="mt-2 text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed">
-            Advancing community empowerment, environmental restoration, WASH infrastructure, and sustainable development across Nigeria and globally.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Community & Sectoral Impact"
+          title="Professional Work & Initiatives"
+          description="Advancing community empowerment, environmental restoration, WASH infrastructure, and sustainable development across Nigeria and globally."
+        />
+        {isError && <p className="mb-6 text-muted" role="status">Work entries could not be loaded. Please try again later.</p>}
 
         {/* Initiatives List */}
         <div className="space-y-6 text-left">
@@ -78,15 +74,15 @@ const WorkPage: React.FC = () => {
 
             return (
               <div
-                key={ele.image?.asset?._id || Math.random()}
-                className="flex flex-col md:flex-row gap-6 p-6 rounded-2xl bg-slate-900/80 border border-slate-800/80 hover:border-slate-700 backdrop-blur-md shadow-xl transition-all"
+                key={ele._id}
+                className="flex flex-col md:flex-row gap-6 p-6 surface-card"
               >
                 {imgUrl && (
-                  <div className="w-full md:w-56 h-40 md:h-auto flex-shrink-0 rounded-xl overflow-hidden bg-slate-950 flex items-center justify-center p-2 border border-slate-800">
-                    <img
+                  <div className="w-full md:w-56 h-40 md:h-auto flex-shrink-0 rounded-xl overflow-hidden bg-cream flex items-center justify-center p-2 border border-line">
+                    <EditorialImage
                       src={imgUrl}
                       className="w-full h-full object-contain"
-                      alt={ele.description}
+                      alt=""
                       loading="lazy"
                     />
                   </div>
@@ -102,20 +98,20 @@ const WorkPage: React.FC = () => {
                         <a
                           key={headingItem._key}
                           href={linkDef.href}
-                          className="font-bold font-serif text-xl md:text-2xl text-blue-400 hover:text-blue-300 underline block mb-2"
+                          className="font-bold font-serif text-xl md:text-2xl text-accent-strong hover:text-accent-strong underline block mb-2"
                           target={linkDef.openInNewTab ? '_blank' : '_self'}
                           rel={linkDef.openInNewTab ? 'noopener noreferrer' : undefined}
                         >
                           {content}
                         </a>
                       ) : (
-                        <h2 key={headingItem._key} className="font-bold font-serif text-xl md:text-2xl text-gray-100 mb-2">
+                        <h2 key={headingItem._key} className="font-bold font-serif text-xl md:text-2xl text-ink mb-2">
                           {content}
                         </h2>
                       );
                     })}
 
-                    <p className="text-slate-300 text-sm md:text-base leading-relaxed">
+                    <p className="text-muted text-sm md:text-base leading-relaxed">
                       {ele.description}
                     </p>
                   </div>

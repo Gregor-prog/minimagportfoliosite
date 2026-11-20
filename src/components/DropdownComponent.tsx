@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { IoIosPlay } from "react-icons/io";
+import { useId } from 'react';
+import { HiChevronDown } from 'react-icons/hi';
 
 interface DropdownProps {
   title: string;
@@ -8,43 +8,26 @@ interface DropdownProps {
   onToggle: () => void;
 }
 
-const DropdownComponent: React.FC<DropdownProps> = ({ title, content, isActive, onToggle }) => {
-  const contentRef = useRef<HTMLDivElement>(null);  // Reference to the dropdown content
+export default function DropdownComponent({ title, content, isActive, onToggle }: DropdownProps) {
+  const panelId = useId();
 
   return (
-    <div className="flex flex-col gap-2 border-b border-white">
-      <button
-        className={`w-full flex justify-start items-center p-4 cursor-pointer ${isActive ? 'text-orange-400' : 'text-white'}`}
-        onClick={onToggle}
-      >
-        <div className="flex gap-2 items-center">
-          <span className={`transform transition-transform ${isActive ? "rotate-90" : ""}`}>
-            <IoIosPlay />
-          </span>
-          <span>
-            <h2 className="text-left">
-            {title}
-            </h2>
-            </span>
-        </div>
-      </button>
-
-      <div
-        ref={contentRef}
-        className="transition-all duration-500 ease-in-out overflow-hidden"
-        style={{
-          maxHeight: isActive ? `${contentRef.current?.scrollHeight}px` : "0px",
-          opacity: isActive ? 1 : 0,
-        }}
-      >
-        <div className="px-4 py-2 text-white whitespace-pre-line flex flex-col gap-1">
-          {content.map((ele, i) => (
-            <p key={i}>{ele}</p>
-          ))}
-        </div>
+    <div className="surface-card">
+      <h2>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left font-serif text-lg text-navy"
+          aria-expanded={isActive}
+          aria-controls={panelId}
+          onClick={onToggle}
+        >
+          {title}
+          <HiChevronDown aria-hidden="true" className={isActive ? 'shrink-0 rotate-180 text-accent-strong' : 'shrink-0 text-accent-strong'} />
+        </button>
+      </h2>
+      <div id={panelId} hidden={!isActive} className="space-y-2 border-t border-line px-5 py-4 text-muted">
+        {content.map((detail, index) => <p key={index} className="whitespace-pre-line">{detail}</p>)}
       </div>
     </div>
   );
-};
-
-export default DropdownComponent;
+}

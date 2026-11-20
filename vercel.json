@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/about", "destination": "/about/profile", "permanent": true },
+    { "source": "/about/fellowships-and-schloarships", "destination": "/about/fellowships-and-scholarships", "permanent": true },
+    { "source": "/writings", "destination": "/writings/papers", "permanent": true },
+    { "source": "/writings/law-and-human-rights", "destination": "/writings/papers", "permanent": true },
+    { "source": "/gallery", "destination": "/gallery/videos", "permanent": true }
+  ],
+  "rewrites": [{ "source": "/:path*", "destination": "/" }]
+}

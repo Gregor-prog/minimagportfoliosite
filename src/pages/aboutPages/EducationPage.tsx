@@ -1,3 +1,5 @@
+import EditorialImage from '../../components/EditorialImage';
+import PageHeader from '../../components/PageHeader';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DropdownComponent from '../../components/DropdownComponent';
@@ -33,14 +35,13 @@ interface EducationPageData {
 }
 
 const fetchEducationPageData = async (): Promise<EducationPageData> => {
-  const educationPageInput = await fetchEducationPageInput();
-  const educationPageHeroImage = await fetchEducationPageHeroImage();
+  const [educationPageInput, educationPageHeroImage] = await Promise.all([
+    fetchEducationPageInput(),
+    fetchEducationPageHeroImage().catch(() => []),
+  ]);
 
   if (!educationPageInput || educationPageInput.length === 0) {
     throw new Error('Education Page input not found');
-  }
-  if (!educationPageHeroImage || educationPageHeroImage.length === 0) {
-    throw new Error('Hero image not found');
   }
 
   return { educationPageInput, educationPageHeroImage };
@@ -51,7 +52,7 @@ const EducationPage: React.FC = () => {
   const { authorName } = useAuthorContext();
   const displayName = authorName || 'Professor Mina Margaret Ogbanga';
 
-  const { data, isLoading } = useQuery<EducationPageData>({
+  const { data, isLoading, isError } = useQuery<EducationPageData>({
     queryKey: ['educationPageData'],
     queryFn: fetchEducationPageData,
   });
@@ -87,29 +88,22 @@ const EducationPage: React.FC = () => {
   }
 
   return (
-    <section className="py-8 md:py-12 font-sans">
-      <div className="md:w-[92%] lg:w-[88%] mx-auto px-4 md:px-6">
+    <section className="page-shell">
+      <div className="site-wrap">
         {/* Header */}
-        <header className="mb-10 pb-6 border-b border-slate-800 text-left">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs uppercase tracking-widest text-blue-400 font-semibold bg-blue-950/60 px-3 py-1 rounded-full border border-blue-800/40">
-              Academic Qualifications & Pedagogy
-            </span>
-          </div>
-          <h1 className="text-white text-3xl md:text-5xl font-bold font-serif tracking-tight">
-            Education & Executive Studies
-          </h1>
-          <p className="mt-2 text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed">
-            University of Cambridge, Harvard University, and doctoral research in sustainable development.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Academic Qualifications & Pedagogy"
+          title="Education & Executive Studies"
+          description="University of Cambridge, Harvard University, and doctoral research in sustainable development."
+        />
+        {isError && <p className="mb-6 text-muted" role="status">Education details could not be loaded. Please try again later.</p>}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Portrait */}
           {educationPageHeroImageUrl && (
             <div className="lg:col-span-5 space-y-4">
-              <div className="rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
-                <img
+              <div className="rounded overflow-hidden bg-paper border border-line">
+                <EditorialImage
                   src={educationPageHeroImageUrl}
                   alt={`Portrait of ${displayName}`}
                   loading="lazy"

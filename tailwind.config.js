@@ -4,23 +4,24 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['Georgia', 'Times New Roman', 'serif'],
+        sans: ['Arial', 'Helvetica', 'sans-serif'],
       },
       colors: {
-        academic: {
-          navy: '#0A0F1D',
-          dark: '#070B14',
-          slate: '#0F172A',
-          card: '#111827',
-          gold: '#F59E0B',
-          amber: '#D97706',
-          accent: '#2563EB',
-          emerald: '#10B981',
-        },
+        navy: 'var(--navy)',
+        ink: 'var(--ink)',
+        muted: 'var(--muted)',
+        cream: 'var(--cream)',
+        paper: 'var(--paper)',
+        line: 'var(--line)',
+        field: 'var(--field)',
+        accent: 'var(--teal)',
+        'accent-strong': 'var(--teal-strong)',
+        'accent-soft': 'var(--teal-soft)',
+        'gold-ink': 'var(--gold-ink)',
+        'gold-soft': 'var(--gold-soft)',
       },
     },
   },
   plugins: [],
 }
-

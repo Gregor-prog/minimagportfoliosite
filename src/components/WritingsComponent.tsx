@@ -1,71 +1,54 @@
-import React from 'react';
 import { urlFor } from '../../sanityApiClient/sanityClient';
+import EditorialImage from './EditorialImage';
+import PageHeader from './PageHeader';
 
-interface LinksDataProps {
+interface WritingLink {
   title: string;
   url: string;
 }
 
-interface BooksDataProps {
-  title: string;
-  image: {
-    asset: {
-      _id: string;
-    };
-  };
-  url: string;
+interface Book extends WritingLink {
+  image?: { asset?: { _id?: string } };
 }
 
 interface WritingsProps {
   title: string;
-  linksData: LinksDataProps[];
-  booksData: BooksDataProps[];
+  linksData?: WritingLink[];
+  booksData?: Book[];
+  status?: string;
 }
 
-const WritingsComponent: React.FC<Partial<WritingsProps>> = ({ title, linksData, booksData }) => {
-  const imageUrls = (booksData || []).map((bookData) =>
-    bookData.image?.asset?._id
-      ? urlFor(bookData.image.asset._id).width(600).quality(80).format('webp').url()
-      : ''
-  );
-
+export default function WritingsComponent({ title, linksData = [], booksData = [], status }: WritingsProps) {
   return (
-    <section>
-      <div>
-        <span className='flex flex-col gap-2 pb-6 capitalize text-left font-bold text-white border-b border-white'>
-          <h1 className='text-white text-2xl font-semibold'>Writings</h1>
-          <h1 className='text-white capitalize text-4xl font-semibold'>{title}</h1>
-        </span>
-
-        <div className='pt-12 flex flex-col gap-12'>
-          {linksData && (
-            <div>
-              <ul className='pl-6 md:pl-16'>
-                {linksData.map((ele, i) => (
-                  <li key={i} className='text-blue-500 list-disc pl-2 font-semibold text-base'>
-                    <a href={ele.url} target="_blank" rel="noopener noreferrer">{ele.title}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {booksData && (
-            <div className='flex md:flex-row gap-6 flex-wrap'>
-              {booksData.map((bookData, i) => (
-                <a key={i} href={bookData.url} target="_blank" rel="noopener noreferrer">
-                  <picture className='flex flex-col items-center justify-center md:max-h-[295px] md:max-w-[210px]'>
-                    <img src={imageUrls[i]} className='w-full h-full' alt={bookData.title} />
-                    <p className='text-center text-white'>{bookData.title}</p>
-                  </picture>
+    <section className="site-wrap page-shell">
+      <PageHeader eyebrow="Scholarship" title={title} />
+      {status && <p role="status">{status}</p>}
+      {!status && booksData.length === 0 && linksData.length === 0 && <p>No entries are available.</p>}
+      {booksData.length > 0 && (
+        <ul className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {booksData.map((book, index) => {
+            const asset = book.image?.asset?._id;
+            const cover = asset ? urlFor(asset).width(480).quality(80).format('webp').url() : undefined;
+            return (
+              <li className="surface-card overflow-hidden" key={`${book.url}-${index}`}>
+                <a href={book.url} target="_blank" rel="noopener noreferrer" className="block">
+                  <EditorialImage src={cover} alt="" loading="lazy" className="aspect-[3/4] w-full bg-cream object-contain" />
+                  <p className="text-link p-3">{book.title}</p>
                 </a>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {linksData.length > 0 && (
+        <ul className="surface-card list-disc space-y-3 py-5 pl-9 pr-5 marker:text-gold-ink">
+          {linksData.map((entry, index) => (
+            <li key={`${entry.url}-${index}`}>
+              <a className="text-link" href={entry.url} target="_blank" rel="noopener noreferrer">{entry.title}</a>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
-};
-
-export default WritingsComponent;
+}

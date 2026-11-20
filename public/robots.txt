@@ -70,4 +70,4 @@ User-agent: facebookexternalhit
 Allow: /
 
 # Sitemaps
-Sitemap: https://minaogbanga.com/sitemap.xml
+Sitemap: https://www.minaogbanga.com/sitemap.xml

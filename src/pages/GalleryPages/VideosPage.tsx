@@ -1,42 +1,37 @@
-import React from 'react';
-import YoutubeEmbed from '../../components/YoutubeEmbed';
-import { useQuery } from '@tanstack/react-query'; 
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { fetchVideoLinks } from '../../../sanityApiClient/useSanityClient';
+import PageHeader from '../../components/PageHeader';
+import YoutubeEmbed from '../../components/YoutubeEmbed';
+import { useAuthorContext } from '../../hooks/AuthorContext';
 
 interface YouTubeEmbedLinks {
   youtubeEmbedLinks: string[];
 }
 
-const fetchVideos = async (): Promise<YouTubeEmbedLinks[]> => {
-  const videoLinks = await fetchVideoLinks();
-  
-  if (!videoLinks || videoLinks.length === 0) {
-    throw new Error('No videos found');
-  }
-
-  return videoLinks;
-};
-
-const VideosPage: React.FC = () => {
-  // Use useQuery to fetch video links
-  const { data: videoLinks = []} = useQuery<YouTubeEmbedLinks[]>({
-    queryKey: ['videoLinks'], 
-    queryFn: fetchVideos 
+export default function VideosPage() {
+  const { authorName } = useAuthorContext();
+  const { data = [], isError, isLoading } = useQuery<YouTubeEmbedLinks[]>({
+    queryKey: ['videoLinks'],
+    queryFn: fetchVideoLinks,
   });
+  const videos = data[0]?.youtubeEmbedLinks ?? [];
 
-  
+  useEffect(() => {
+    document.title = `Keynotes & Media Appearances - ${authorName}`;
+  }, [authorName]);
 
   return (
-    <section>
-      <div className='md:w-[90%]  px-4 md:px-6 py-8'>
-        <div className="flex flex-wrap gap-4">
-          {videoLinks[0]?.youtubeEmbedLinks.map((url, index) => (
-            <YoutubeEmbed key={index} videoUrl={url} />
-          ))}
-        </div>
+    <section className="site-wrap page-shell">
+      <PageHeader eyebrow="Gallery" title="Keynotes & Media Appearances" />
+      {isLoading && <p role="status">Loading videos…</p>}
+      {isError && <p role="status">Videos could not be loaded. Please try again later.</p>}
+      {!isLoading && !isError && videos.length === 0 && <p>No videos are available.</p>}
+      <div className="grid gap-6 md:grid-cols-2">
+        {videos.map((url, index) => (
+          <YoutubeEmbed key={`${url}-${index}`} videoUrl={url} title={`YouTube video ${index + 1}`} />
+        ))}
       </div>
     </section>
   );
 }
-
-export default VideosPage;

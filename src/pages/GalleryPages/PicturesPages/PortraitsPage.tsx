@@ -1,73 +1,48 @@
-import React, { useEffect } from 'react';
-import ImagesComponent from '../../../components/ImagesComponent';
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchPortaitPicturesLinks } from '../../../../sanityApiClient/useSanityClient';
+import ImagesComponent from '../../../components/ImagesComponent';
+import PageHeader from '../../../components/PageHeader';
 import { useAuthorContext } from '../../../hooks/AuthorContext';
+import { fetchPortaitPicturesLinks } from '../../../../sanityApiClient/useSanityClient';
 import { urlFor } from '../../../../sanityApiClient/sanityClient';
 
 interface ImageLink {
-  _id: string;            
-  imageTitle: string;     
-  description: string;    
-  uploadedAt: string;     
-  image: {
-    asset: {
-      _id: string;
-    };
-  };
+  _id: string;
+  imageTitle?: string;
+  description?: string;
+  image?: { asset?: { _id?: string } };
 }
 
-interface PortraitsPageResponse {
-  portraitsPageData: ImageLink[]; 
-}
-
-const fetchPortraitsPagedata = async (): Promise<PortraitsPageResponse> => {
-  const portraitsPageData = await fetchPortaitPicturesLinks();
-
-  if (!portraitsPageData || portraitsPageData.length === 0) {
-    throw new Error('Portraits Page Data Not found');
-  }
-
-  return { portraitsPageData };
-};
-
-const PortraitsPage: React.FC = () => {
-  const { data } = useQuery<PortraitsPageResponse>({
-    queryKey: ['portraitsPageResponse'],
-    queryFn: fetchPortraitsPagedata,
-  });
-
+export default function PortraitsPage() {
   const { authorName } = useAuthorContext();
+  const { data = [], isLoading, isError } = useQuery<ImageLink[]>({
+    queryKey: ['portraitsPageResponse'],
+    queryFn: fetchPortaitPicturesLinks,
+  });
 
   useEffect(() => {
     document.title = `Field Work Pictures - ${authorName}`;
   }, [authorName]);
 
-  
-  if (!data) {
-    return null
-  }
-
-  const { portraitsPageData } = data;
-
-  const formattedImages = portraitsPageData.map((imageLink) => ({
-    url: urlFor(imageLink.image.asset._id)
-      .width(1920)
-      .quality(80)
-      .format('webp')
-      .url(),
-    _id: imageLink._id,
-    title: imageLink.imageTitle,
-    description: imageLink.description,
-  }));
+  const images = data.map((record, index) => {
+    const asset = record.image?.asset?._id;
+    const source = asset ? urlFor(asset).quality(82).format('webp') : null;
+    return {
+      _id: record._id,
+      title: record.imageTitle || `Portrait ${index + 1}`,
+      description: record.description,
+      url: source?.width(1600).url(),
+      previewUrl: source?.width(480).url(),
+    };
+  });
 
   return (
-    <section>
-      <div className='md:w-[95%] mx-auto px-4 md:px-6 py-8'>
-        <ImagesComponent images={formattedImages} />
-      </div>
+    <section className="site-wrap page-shell">
+      <PageHeader eyebrow="Gallery" title="Official Portraits" />
+      {isLoading && <p role="status">Loading portraits…</p>}
+      {isError && <p role="status">Portraits could not be loaded. Please try again later.</p>}
+      {!isLoading && !isError && images.length === 0 && <p>No portraits are available.</p>}
+      <ImagesComponent images={images} />
     </section>
   );
-};
-
-export default PortraitsPage;
+}

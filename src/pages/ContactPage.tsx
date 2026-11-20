@@ -1,3 +1,4 @@
+import PageHeader from '../components/PageHeader';
 import React, { useState, useEffect } from "react";
 import {
   FaFacebookF,
@@ -12,8 +13,7 @@ import { SiAcademia, SiGooglescholar } from "react-icons/si";
 import { 
   HiOutlineAcademicCap, 
   HiOutlineLocationMarker, 
-  HiOutlineCheckCircle,
-  HiOutlineSparkles
+  HiOutlineCheckCircle
 } from "react-icons/hi";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSocialLinks } from "../../sanityApiClient/useSanityClient";
@@ -83,47 +83,38 @@ const ContactPage: React.FC = () => {
   };
 
   return (
-    <section className="py-8 md:py-14 font-sans">
-      <div className="md:w-[92%] lg:w-[88%] mx-auto px-4 md:px-6 space-y-12">
+    <section className="page-shell">
+      <div className="site-wrap">
         {/* Header */}
-        <header className="text-left space-y-3 border-b border-slate-800 pb-8">
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-widest text-blue-400 font-semibold bg-blue-950/70 px-3 py-1 rounded-full border border-blue-800/40 flex items-center gap-1.5">
-              <HiOutlineSparkles className="text-sm" />
-              Speaking & Consultations
-            </span>
-          </div>
-          <h1 className="text-white text-3xl md:text-5xl font-bold font-serif tracking-tight">
-            Engagements, Advisory & Contact
-          </h1>
-          <p className="text-slate-300 text-sm md:text-base max-w-2xl leading-relaxed">
-            Invite {displayName} for keynote lectures, policy advisory, research collaborations, or international conference panels.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Speaking & Consultations"
+          title="Engagements, Advisory & Contact"
+          description={`Invite ${displayName} for keynote lectures, policy advisory, research collaborations, or international conference panels.`}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Structured Engagement Form */}
-          <div className="lg:col-span-7 bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-2xl">
-            <h2 className="text-xl font-bold text-gray-100 font-serif mb-1">
+          <div className="lg:col-span-7 surface-card p-6 md:p-8">
+            <h2 className="text-xl font-bold text-ink font-serif mb-1">
               Submit an Invitation or Inquiry
             </h2>
-            <p className="text-xs text-slate-400 mb-6">
+            <p className="text-xs text-muted mb-6">
               Please specify the scope, proposed dates, and institutional context for the promptest response.
             </p>
 
             {isSubmitted ? (
-              <div className="bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-6 text-center space-y-3">
-                <HiOutlineCheckCircle className="text-emerald-400 text-4xl mx-auto" />
-                <h3 className="text-emerald-300 font-bold text-base">Inquiry Prepared</h3>
-                <p className="text-xs text-slate-300 max-w-md mx-auto">
-                  Your mail application has been opened with your structured message. If it didn't open automatically, send directly to{' '}
-                  <a href={`mailto:${recipientEmail}`} className="text-blue-400 underline font-semibold">
+              <div className="bg-accent-soft border border-line rounded p-5 text-center space-y-3" role="status">
+                <HiOutlineCheckCircle className="text-accent-strong text-4xl mx-auto" />
+                <h3 className="text-accent-strong font-bold text-base">Inquiry Prepared</h3>
+                <p className="text-xs text-muted max-w-md mx-auto">
+                  Your draft is ready to review and send in your email app. You can also email{' '}
+                  <a href={`mailto:${recipientEmail}`} className="text-accent-strong underline font-semibold">
                     {recipientEmail}
                   </a>.
                 </p>
                 <button
                   onClick={() => setIsSubmitted(false)}
-                  className="text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 px-4 py-2 rounded-lg mt-2"
+                  className="text-xs font-semibold text-muted hover:text-navy bg-accent-soft px-4 py-2 rounded-lg mt-2"
                 >
                   Send another inquiry
                 </button>
@@ -132,50 +123,55 @@ const ContactPage: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-4 text-left">
                 {/* Inquiry Type */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                  <label htmlFor="inquiry-category" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
                     Engagement Category
                   </label>
                   <select
+                    id="inquiry-category"
                     value={inquiryType}
                     onChange={(e) => setInquiryType(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-cream border border-field rounded-xl px-4 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent"
                   >
-                    <option value="Keynote Address & Guest Lecture">🎓 Keynote Address & Guest Lecture</option>
-                    <option value="Environmental & Climate Policy Advisory">🌍 Environmental & Climate Policy Advisory</option>
-                    <option value="Academic & Research Collaboration">🤝 Academic & Research Collaboration</option>
-                    <option value="Press & Media Interview">🎙️ Press & Media Interview</option>
-                    <option value="General Academic Inquiry">✉️ General Academic Inquiry</option>
+                    <option>Keynote Address & Guest Lecture</option>
+                    <option>Environmental & Climate Policy Advisory</option>
+                    <option>Academic & Research Collaboration</option>
+                    <option>Press & Media Interview</option>
+                    <option>General Academic Inquiry</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Name */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label htmlFor="inquiry-name" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
                       Your Full Name *
                     </label>
                     <input
+                      id="inquiry-name"
+                      autoComplete="name"
                       type="text"
                       required
                       placeholder="e.g. Dr. Jane Doe"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-cream border border-field rounded-xl px-4 py-2.5 text-sm text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
                     />
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label htmlFor="inquiry-email" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
                       Official Email *
                     </label>
                     <input
+                      id="inquiry-email"
+                      autoComplete="email"
                       type="email"
                       required
                       placeholder="e.g. j.doe@university.edu"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-cream border border-field rounded-xl px-4 py-2.5 text-sm text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
                     />
                   </div>
                 </div>
@@ -183,53 +179,57 @@ const ContactPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Organization */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label htmlFor="inquiry-organization" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
                       Organization / University
                     </label>
                     <input
+                      id="inquiry-organization"
+                      autoComplete="organization"
                       type="text"
                       placeholder="e.g. United Nations / Oxford"
                       value={formData.organization}
                       onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-cream border border-field rounded-xl px-4 py-2.5 text-sm text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
                     />
                   </div>
 
                   {/* Proposed Date */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label htmlFor="inquiry-date" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
                       Proposed Date / Timeline
                     </label>
                     <input
+                      id="inquiry-date"
                       type="text"
                       placeholder="e.g. Q4 2026 / November 15"
                       value={formData.eventDate}
                       onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-cream border border-field rounded-xl px-4 py-2.5 text-sm text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
                     />
                   </div>
                 </div>
 
                 {/* Message */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                  <label htmlFor="inquiry-message" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
                     Engagement Details / Agenda *
                   </label>
                   <textarea
+                    id="inquiry-message"
                     required
                     rows={4}
                     placeholder="Describe the occasion, audience profile, topic objectives, or collaboration goals..."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-sm text-gray-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-cream border border-field rounded-xl p-4 text-sm text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 px-6 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all duration-200 transform hover:-translate-y-0.5"
+                  className="site-button w-full"
                 >
-                  Send Formal Inquiry
+                  Open Email Draft
                 </button>
               </form>
             )}
@@ -238,12 +238,12 @@ const ContactPage: React.FC = () => {
           {/* Right Column: Academic Networks & Affiliations */}
           <div className="lg:col-span-5 space-y-6 text-left">
             {/* Academic Profiles Card */}
-            <div className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-md shadow-xl space-y-4">
-              <h3 className="text-base font-bold text-gray-100 font-serif flex items-center gap-2">
-                <HiOutlineAcademicCap className="text-blue-400 text-lg" />
+            <div className="surface-card p-6 space-y-4">
+              <h2 className="text-lg text-navy font-serif flex items-center gap-2">
+                <HiOutlineAcademicCap className="text-accent-strong text-lg" />
                 Scholarly Repositories & Profiles
-              </h3>
-              <p className="text-xs text-slate-400">
+              </h2>
+              <p className="text-xs text-muted">
                 Explore publication indices, citation metrics, and peer connections:
               </p>
 
@@ -253,18 +253,18 @@ const ContactPage: React.FC = () => {
                     href={social.googlescholar}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-800/40 transition-all group"
+                    className="flex items-center justify-between p-3 rounded-xl bg-cream border border-line hover:border-accent hover:bg-accent-soft transition-colors group"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-blue-950 text-blue-400 group-hover:scale-110 transition-transform">
+                      <div className="p-2 rounded-lg bg-accent-soft text-accent-strong group-hover:scale-110 transition-transform">
                         <SiGooglescholar size={20} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-200">Google Scholar</p>
-                        <p className="text-[11px] text-slate-400">Citations & Academic Index</p>
+                        <p className="text-sm font-semibold text-ink">Google Scholar</p>
+                        <p className="text-[11px] text-muted">Citations & Academic Index</p>
                       </div>
                     </div>
-                    <span className="text-xs text-blue-400 font-medium">View &rarr;</span>
+                    <span className="text-xs text-accent-strong font-medium">View &rarr;</span>
                   </a>
                 )}
 
@@ -273,18 +273,18 @@ const ContactPage: React.FC = () => {
                     href={social.researchgate}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-800/40 transition-all group"
+                    className="flex items-center justify-between p-3 rounded-xl bg-cream border border-line hover:border-line hover:bg-accent-soft transition-all group"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-emerald-950 text-emerald-400 group-hover:scale-110 transition-transform">
+                      <div className="p-2 rounded-lg bg-accent-soft text-accent-strong group-hover:scale-110 transition-transform">
                         <FaResearchgate size={20} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-200">ResearchGate</p>
-                        <p className="text-[11px] text-slate-400">Peer Publications & Discussion</p>
+                        <p className="text-sm font-semibold text-ink">ResearchGate</p>
+                        <p className="text-[11px] text-muted">Peer Publications & Discussion</p>
                       </div>
                     </div>
-                    <span className="text-xs text-emerald-400 font-medium">View &rarr;</span>
+                    <span className="text-xs text-accent-strong font-medium">View &rarr;</span>
                   </a>
                 )}
 
@@ -293,18 +293,18 @@ const ContactPage: React.FC = () => {
                     href={social.academiaEdu}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-800/40 transition-all group"
+                    className="flex items-center justify-between p-3 rounded-xl bg-cream border border-line hover:border-line hover:bg-accent-soft transition-all group"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-slate-900 text-gray-300 group-hover:scale-110 transition-transform">
+                      <div className="p-2 rounded-lg bg-paper text-muted group-hover:scale-110 transition-transform">
                         <SiAcademia size={20} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-200">Academia.edu</p>
-                        <p className="text-[11px] text-slate-400">Scholarly Papers & Research</p>
+                        <p className="text-sm font-semibold text-ink">Academia.edu</p>
+                        <p className="text-[11px] text-muted">Scholarly Papers & Research</p>
                       </div>
                     </div>
-                    <span className="text-xs text-blue-400 font-medium">View &rarr;</span>
+                    <span className="text-xs text-accent-strong font-medium">View &rarr;</span>
                   </a>
                 )}
 
@@ -313,44 +313,44 @@ const ContactPage: React.FC = () => {
                     href={social.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-800/40 transition-all group"
+                    className="flex items-center justify-between p-3 rounded-xl bg-cream border border-line hover:border-line hover:bg-accent-soft transition-all group"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-blue-900/60 text-blue-300 group-hover:scale-110 transition-transform">
+                      <div className="p-2 rounded-lg bg-accent-soft text-accent-strong group-hover:scale-110 transition-transform">
                         <FaLinkedinIn size={20} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-200">LinkedIn Profile</p>
-                        <p className="text-[11px] text-slate-400">Executive & Professional Network</p>
+                        <p className="text-sm font-semibold text-ink">LinkedIn Profile</p>
+                        <p className="text-[11px] text-muted">Executive & Professional Network</p>
                       </div>
                     </div>
-                    <span className="text-xs text-blue-400 font-medium">Connect &rarr;</span>
+                    <span className="text-xs text-accent-strong font-medium">Connect &rarr;</span>
                   </a>
                 )}
               </div>
             </div>
 
             {/* Direct Contacts & Institutional Office */}
-            <div className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-md shadow-xl space-y-4">
-              <h3 className="text-base font-bold text-gray-100 font-serif flex items-center gap-2">
-                <HiOutlineLocationMarker className="text-amber-400 text-lg" />
+            <div className="surface-card p-6 space-y-4">
+              <h2 className="text-lg text-navy font-serif flex items-center gap-2">
+                <HiOutlineLocationMarker className="text-gold-ink text-lg" />
                 Institutional Affiliations
-              </h3>
-              <div className="space-y-3 text-xs text-slate-300">
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-                  <p className="font-semibold text-gray-200">Rivers State University (RSU)</p>
-                  <p className="text-slate-400 mt-0.5">Centre for Water and Sanitation Studies</p>
-                  <p className="text-[11px] text-slate-500">Port Harcourt, Rivers State, Nigeria</p>
+              </h2>
+              <div className="space-y-3 text-xs text-muted">
+                <div className="p-3 rounded-xl bg-cream border border-line">
+                  <p className="font-semibold text-ink">Rivers State University (RSU)</p>
+                  <p className="text-muted mt-0.5">Centre for Water and Sanitation Studies</p>
+                  <p className="text-[11px] text-muted">Port Harcourt, Rivers State, Nigeria</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-                  <p className="font-semibold text-gray-200">Indiana University–Purdue University Indianapolis (IUPUI)</p>
-                  <p className="text-slate-400 mt-0.5">Global Associate, School of Social Work</p>
+                <div className="p-3 rounded-xl bg-cream border border-line">
+                  <p className="font-semibold text-ink">Indiana University–Purdue University Indianapolis (IUPUI)</p>
+                  <p className="text-muted mt-0.5">Global Associate, School of Social Work</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-                  <p className="font-semibold text-gray-200">Direct Office Email</p>
-                  <a href={`mailto:${recipientEmail}`} className="text-blue-400 font-semibold underline block mt-0.5">
+                <div className="p-3 rounded-xl bg-cream border border-line">
+                  <p className="font-semibold text-ink">Direct Office Email</p>
+                  <a href={`mailto:${recipientEmail}`} className="text-accent-strong font-semibold underline block mt-0.5">
                     {recipientEmail}
                   </a>
                 </div>
@@ -363,8 +363,8 @@ const ContactPage: React.FC = () => {
                     href={social.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-xl bg-emerald-950/80 text-emerald-400 border border-emerald-800/40 hover:bg-emerald-900 transition-colors"
-                    title="WhatsApp"
+                    className="p-2.5 rounded-xl bg-accent-soft text-accent-strong border border-line hover:bg-accent-soft transition-colors"
+                    aria-label="WhatsApp"
                   >
                     <FaWhatsapp size={18} />
                   </a>
@@ -374,8 +374,8 @@ const ContactPage: React.FC = () => {
                     href={social.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-xl bg-slate-950 text-sky-400 border border-slate-800 hover:bg-slate-800 transition-colors"
-                    title="Twitter / X"
+                    className="p-2.5 rounded-xl bg-cream text-accent-strong border border-line hover:bg-accent-soft transition-colors"
+                    aria-label="Twitter / X"
                   >
                     <FaTwitter size={18} />
                   </a>
@@ -385,8 +385,8 @@ const ContactPage: React.FC = () => {
                     href={social.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-xl bg-slate-950 text-blue-400 border border-slate-800 hover:bg-slate-800 transition-colors"
-                    title="Facebook"
+                    className="p-2.5 rounded-xl bg-cream text-accent-strong border border-line hover:bg-accent-soft transition-colors"
+                    aria-label="Facebook"
                   >
                     <FaFacebookF size={18} />
                   </a>
@@ -396,8 +396,8 @@ const ContactPage: React.FC = () => {
                     href={social.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-xl bg-slate-950 text-pink-400 border border-slate-800 hover:bg-slate-800 transition-colors"
-                    title="Instagram"
+                    className="p-2.5 rounded-xl bg-cream text-pink-400 border border-line hover:bg-accent-soft transition-colors"
+                    aria-label="Instagram"
                   >
                     <FaInstagram size={18} />
                   </a>
@@ -407,8 +407,8 @@ const ContactPage: React.FC = () => {
                     href={social.telegram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-xl bg-slate-950 text-cyan-400 border border-slate-800 hover:bg-slate-800 transition-colors"
-                    title="Telegram"
+                    className="p-2.5 rounded-xl bg-cream text-accent-strong border border-line hover:bg-accent-soft transition-colors"
+                    aria-label="Telegram"
                   >
                     <FaTelegramPlane size={18} />
                   </a>
