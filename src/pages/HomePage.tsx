@@ -137,8 +137,9 @@ export default function HomePage() {
             </article>
             <article className="home-card">
               <p className="eyebrow">Academic publishing</p>
-              <h3>International Journal of Social Work and Development Studies</h3>
-              <a className="text-link" href="https://www.ijsds.org">Visit the journal <span aria-hidden="true">↗</span></a>
+              <h3>International Journal of Social Work and Development Studies (IJSDS)</h3>
+              <p>Professor Ogbanga serves as Editor-in-Chief.</p>
+              <a className="text-link" href="https://www.ijsds.org/">Visit the journal <span aria-hidden="true">↗</span></a>
             </article>
             <article className="home-card">
               <p className="eyebrow">Community development</p>

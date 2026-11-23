@@ -110,6 +110,12 @@ const ProfilePage: React.FC = () => {
               <p className="text-muted">
                 Centre for Water and Sanitation Studies • Global Associate, IUPUI School of Social Work
               </p>
+              <p className="text-muted">
+                Editor-in-Chief of the{' '}
+                <a className="text-link" href="https://www.ijsds.org/">
+                  International Journal of Social Work and Development Studies (IJSDS)
+                </a>
+              </p>
             </div>
           </div>
 

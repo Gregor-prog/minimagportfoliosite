@@ -11,13 +11,13 @@ const routes = [
   {
     path: homePath,
     heading: name,
-    description: 'Official academic portfolio of Professor Mina Margaret Ogbanga, Professor of Social Work and Environmental Sustainability, Ford Foundation Fellow, and sustainable development advocate.',
+    description: 'Professor Mina Margaret Ogbanga is a Professor of Social Work and Environmental Sustainability, Ford Foundation Fellow, and Editor-in-Chief of IJSDS.',
     summary: 'Professor Mina Margaret Ogbanga works across social work, environmental sustainability, public policy and community development. She is affiliated with the Centre for Water and Sanitation Studies at Rivers State University and is a Global Associate at the IUPUI School of Social Work.',
   },
   {
     path: '/about/profile',
     heading: 'Executive Profile',
-    description: 'Biography and academic affiliations of Professor Mina Margaret Ogbanga, a social work and environmental sustainability scholar and Ford Foundation Fellow.',
+    description: 'Biography and academic affiliations of Professor Mina Margaret Ogbanga, Editor-in-Chief of the International Journal of Social Work and Development Studies (IJSDS).',
     summary: 'Professor Mina Margaret Ogbanga’s work connects academic leadership, environmental sustainability and community development. Her profile covers her work at Rivers State University in Port Harcourt, Nigeria, and her affiliation with the IUPUI School of Social Work.',
     type: 'ProfilePage',
     related: ['/about/my-work', '/about/education', '/about/fellowships-and-scholarships', '/about/awards-and-recognitions'],
@@ -150,10 +150,14 @@ function renderSummary(route) {
     ? `\n        <p>Email <a class="text-link" href="mailto:${escapeHtml(route.email)}">${escapeHtml(route.email)}</a>.</p>`
     : '';
 
+  const editorialRole = route === home || route.type === 'ProfilePage'
+    ? '\n        <p>Professor Ogbanga serves as Editor-in-Chief of the <a class="text-link" href="https://www.ijsds.org/">International Journal of Social Work and Development Studies (IJSDS)</a>.</p>'
+    : '';
+
   return `<div id="root">
       <main class="site-wrap page-shell">
         <h1>${escapeHtml(route.heading)}</h1>
-        <p>${escapeHtml(route.summary)}</p>${email}
+        <p>${escapeHtml(route.summary)}</p>${editorialRole}${email}
         <nav class="mt-6" aria-label="${route === home ? 'Portfolio pages' : 'Related pages'}">
           <ul>
 ${links}
