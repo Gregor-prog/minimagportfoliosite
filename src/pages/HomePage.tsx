@@ -7,6 +7,7 @@ import { useAuthorContext } from '../hooks/AuthorContext';
 import EditorialImage from '../components/EditorialImage';
 
 const defaultName = 'Professor Mina Margaret Ogbanga';
+const defaultPortraitId = 'image-b27b4aae46a828a6502cee62ea467c1fbd279471-4528x3016-jpg';
 
 const impactAreas = [
   {
@@ -41,8 +42,8 @@ export default function HomePage() {
     queryFn: fetchHomePageHeroImage,
     staleTime: 5 * 60 * 1000,
   });
-  const portraitId = portraits?.[0]?.image?.asset?._id;
-  const portraitUrl = portraitId ? urlFor(portraitId).format('webp').quality(85) : null;
+  const portraitId = portraits?.[0]?.image?.asset?._id ?? defaultPortraitId;
+  const portraitUrl = urlFor(portraitId).format('webp').quality(85);
 
   useEffect(() => {
     document.title = `Home - ${displayName}`;
@@ -67,16 +68,14 @@ export default function HomePage() {
           </div>
           <div className="home-portrait">
             <span className="portrait-monogram" aria-hidden="true">MO</span>
-            {portraitUrl && (
-              <EditorialImage
-                className="home-portrait-image"
-                src={portraitUrl.width(640).url()}
-                srcSet={[400, 640, 960].map((width) => `${portraitUrl.width(width).url()} ${width}w`).join(', ')}
-                sizes="(max-width: 520px) calc(100vw - 56px), (max-width: 800px) 410px, 42vw"
-                alt={`Portrait of ${displayName}`}
-                fetchPriority="high"
-              />
-            )}
+            <EditorialImage
+              className="home-portrait-image"
+              src={portraitUrl.width(640).url()}
+              srcSet={[400, 640, 960].map((width) => `${portraitUrl.width(width).url()} ${width}w`).join(', ')}
+              sizes="(max-width: 520px) calc(100vw - 56px), (max-width: 800px) 410px, 42vw"
+              alt={`Portrait of ${displayName}`}
+              fetchPriority="high"
+            />
           </div>
         </div>
       </section>
