@@ -4,12 +4,12 @@ import HomePage from '../pages/HomePage';
 import ProfilePage from '../pages/aboutPages/ProfilePage';
 import WorkPage from '../pages/aboutPages/WorkPage';
 import EducationPage from '../pages/aboutPages/EducationPage';
-import FellowShipSchloarshipPage from '../pages/aboutPages/FellowShipSchloarshipPage';
+import FellowShipScholarshipPage from '../pages/aboutPages/FellowshipScholarshipPage';
 import ManualsPage from '../pages/writingsPages/ManualsPage';
 import VideosPage from '../pages/GalleryPages/VideosPage';
-import Layout, {LayoutLoader} from './Layout';
+import Layout from './Layout';
 import AwardsPage from '../pages/aboutPages/AwardsPage';
-import PortraitsPage from '../pages/GalleryPages/PicturesPages/PotraitsPage';
+import PortraitsPage from '../pages/GalleryPages/PicturesPages/PortraitsPage';
 import NewsPage from '../pages/GalleryPages/NewsPage';
 import BlogPage from '../pages/BlogPage';
 import ContactPage from '../pages/ContactPage';
@@ -19,18 +19,16 @@ import TextBooksPage from '../pages/writingsPages/TextBooksPage';
 
 const router = createBrowserRouter([
   {
-    path: "/home",
-    element: <HomePage />,  
-  },
- 
-  {
     path: "/",
     element: <Layout />, 
-    loader: LayoutLoader,
     children: [
       {
         index: true,
         element: <Navigate to="/home" replace={true} />,
+      },
+      {
+        path: "home",
+        element: <HomePage />,
       },
       {
         path: "about",
@@ -53,7 +51,11 @@ const router = createBrowserRouter([
           },
           {
             path: "fellowships-and-scholarships",
-            element: <FellowShipSchloarshipPage />,
+            element: <FellowShipScholarshipPage />,
+          },
+          {
+            path: "fellowships-and-schloarships",
+            element: <Navigate to="/about/fellowships-and-scholarships" replace={true} />,
           },
           {
             path: "awards-and-recognitions",
@@ -66,7 +68,11 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="law-and-human-rights" replace={true} />,
+            element: <Navigate to="papers" replace={true} />,
+          },
+          {
+            path: "law-and-human-rights",
+            element: <Navigate to="/writings/papers" replace={true} />,
           },
           {
             path: "papers",
@@ -117,11 +123,11 @@ const router = createBrowserRouter([
         path: "contact",
         element: <ContactPage />,
       },
+      {
+        path: "*",
+        element: <ErrorPage />,
+      },
     ],
-  },
-  {
-    path: "*",
-    element: <ErrorPage />,
   },
 ]);
 

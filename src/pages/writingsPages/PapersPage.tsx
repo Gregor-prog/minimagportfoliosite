@@ -1,8 +1,10 @@
+import PageHeader from '../../components/PageHeader';
 import React, { useEffect } from 'react';
-import WritingsComponent from '../../components/WritingsComponent';
+import PublicationExplorer, { PublicationItem } from '../../components/PublicationExplorer';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthorContext } from '../../hooks/AuthorContext';
 import { fetchPapersImageWritingsLinks, fetchPapersWritingsLinks } from '../../../sanityApiClient/useSanityClient';
+import WholePageSpinner from '../../components/WholePageSpinner';
 
 interface ImageBookLink {
   title: string;
@@ -15,53 +17,64 @@ interface ImageBookLink {
 }
 
 interface BookLink {
-  items: {
-    title: string;
-    url: string;  
-  }[];
+  items: PublicationItem[];
 }
 
 interface PapersPageData {
   papersImageWritingsData: ImageBookLink[];
-  papersWritingsData: BookLink[]; // Changed to reflect a single object, not an array
+  papersWritingsData: BookLink[];
 }
 
 const fetchPapersPageData = async (): Promise<PapersPageData> => {
-  const papersImageWritingsData = await fetchPapersImageWritingsLinks();
-  const papersWritingsData = await fetchPapersWritingsLinks();
+  const [papersImageWritingsData, papersWritingsData] = await Promise.all([
+    fetchPapersImageWritingsLinks().catch(() => []),
+    fetchPapersWritingsLinks(),
+  ]);
 
-  console.log("Fetched Image Writings Data:", papersImageWritingsData); 
-  console.log("Fetched Writings Links Data:", papersWritingsData); 
-  return { papersImageWritingsData, papersWritingsData };
+  return {
+    papersImageWritingsData: papersImageWritingsData || [],
+    papersWritingsData: papersWritingsData || [],
+  };
 };
 
 const PapersPage: React.FC = () => {
   const { authorName } = useAuthorContext();
 
   useEffect(() => {
-    document.title = `Papers - ${authorName}`;
+    document.title = `Research Publications & Papers - ${authorName || 'Prof. Mina Margaret Ogbanga'}`;
   }, [authorName]);
 
-  const { data} = useQuery<PapersPageData>({
+  const { data, isLoading, isError } = useQuery<PapersPageData>({
     queryKey: ['papersData'],
     queryFn: fetchPapersPageData,
   });
 
+  const papers: PublicationItem[] = (data?.papersWritingsData || []).flatMap((d) => d.items || []);
 
-  console.log("Data from useQuery:", data);
+  if (isLoading) {
+    return <WholePageSpinner />;
+  }
 
   return (
-    <section>
-      <div className="md:w-[85%] mx-auto px-4 md:px-6 py-8">
-        <div>
-          {data && (
-            <WritingsComponent
-              booksData={data?.papersImageWritingsData}
-              linksData={data?.papersWritingsData[0].items} 
-              title="Papers"
-            />
-          )}
-        </div>
+    <section className="page-shell">
+      <div className="site-wrap">
+        {/* Academic Page Header */}
+        <PageHeader
+          eyebrow="Scholarship & Research"
+          title="Academic Papers & Publications"
+          description={`Peer-reviewed articles, scholarly monographs, and policy research on environmental social work, sustainability, conflict resolution, and the extractive sector by ${authorName || 'Prof. Mina Margaret Ogbanga'}.`}
+        />
+
+        {/* Interactive Publication Explorer */}
+        {isError ? (
+          <p className="text-muted" role="status">Publications could not be loaded. Please try again later.</p>
+        ) : (
+          <PublicationExplorer
+            papers={papers}
+            imagePapers={data?.papersImageWritingsData}
+            authorName={authorName}
+          />
+        )}
       </div>
     </section>
   );

@@ -1,23 +1,16 @@
-import React from 'react'
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHeader from '../components/PageHeader';
 
-const ErrorPage:React.FC = () => {
-   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <h1 className="text-6xl font-bold text-gray-800 animate-bounce">404</h1>
-      <p className="text-2xl text-gray-600 mt-4">Oops! Page not found.</p>
-      <p className="text-gray-500 mt-2">The page you're looking for doesn't exist.</p>
-      <Link
-        to="/home"
-        className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out"
-      >
-        Go to Homepage
-      </Link>
-    </div>
+export default function ErrorPage() {
+  useEffect(() => {
+    document.title = 'Page Not Found - Professor Mina Margaret Ogbanga';
+  }, []);
+
+  return (
+    <section className="site-wrap page-shell">
+      <PageHeader eyebrow="404" title="Page not found" description="The page you’re looking for may have moved." />
+      <Link className="site-button" to="/home">Return to the homepage</Link>
+    </section>
   );
-
-
-
-};
-
-export default ErrorPage;
+}

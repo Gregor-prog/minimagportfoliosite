@@ -1,66 +1,39 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchNewsLinks } from '../../../sanityApiClient/useSanityClient';
 import { useAuthorContext } from '../../hooks/AuthorContext';
-import WholePageSpinner from '../../components/WholePageSpinner';
+import PageHeader from '../../components/PageHeader';
 
-export interface NewsLink {
-    _id: string;
-    urls: string[];  
+interface NewsLink {
+  _id: string;
+  urls: string[];
 }
 
-const NewsPage: React.FC = () => {
-    const { authorName } = useAuthorContext();
+export default function NewsPage() {
+  const { authorName } = useAuthorContext();
+  const { data = [], isError, isLoading } = useQuery<NewsLink[]>({
+    queryKey: ['newsLinks'],
+    queryFn: fetchNewsLinks,
+  });
+  const urls = data[0]?.urls ?? [];
 
-    const { data: newsLinks = [], error, isLoading } = useQuery<NewsLink[], Error>({
-        queryKey: ['newsLinks'],
-        queryFn: fetchNewsLinks,
-        staleTime: 0
-    });
+  useEffect(() => {
+    document.title = `News - ${authorName}`;
+  }, [authorName]);
 
-    useEffect(() => {
-        document.title = `News - ${authorName}`;
-    }, [authorName]);
-
-    if (isLoading) {
-        return <WholePageSpinner />;
-    }
-
-    if (error) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <p className="text-red-500 text-lg">Error loading news links: {error.message}</p>
-            </div>
-        );
-    }
-
-    return (
-        <section>
-            <div className='md:w-[95%] mx-auto px-4 md:px-6 py-8 flex flex-col gap-20'>
-                <span>
-                    <h2 className="text-white text-4xl font-bold text-center mb-4">News</h2>
-                </span>
-
-                <div>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {newsLinks[0]?.urls.map((link) => (
-                            <li key={link} className='list-disc md:pl-2 marker:text-[#E19618] marker:text-lg'>
-                                <a
-                                    href={link}
-                                    className="block text-blue-500 text-lg font-semibold hover:underline hover:text-orange-500 break-words"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {link}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        </section>
-    );
+  return (
+    <section className="site-wrap page-shell">
+      <PageHeader eyebrow="Gallery" title="News & Press" />
+      {isLoading && <p role="status">Loading news…</p>}
+      {isError && <p role="status">News links could not be loaded. Please try again later.</p>}
+      {!isLoading && !isError && urls.length === 0 && <p>No news links are available.</p>}
+      <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {urls.map((link, index) => (
+          <li className="surface-card p-4" key={`${link}-${index}`}>
+            <a className="text-link break-all" href={link} target="_blank" rel="noopener noreferrer">{link}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
-
-export default NewsPage;
-

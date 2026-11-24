@@ -1,160 +1,79 @@
-// import React from 'react';
-// interface ImageViewerProps {
-//   images: string[];
-//   currentIndex: number;
-//   closeViewer: () => void;
-//   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
-// }
-
-// const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentIndex, closeViewer, setCurrentIndex }) => {
-//   const goToPrevious = () => {
-//     setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
-//   };
-
-//   const goToNext = () => {
-//     setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
-//   };
-
-//   // Handler to close the viewer if clicked outside the image
-//   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-//     // Check if the click is outside the image by comparing the clicked target with the image container
-//     if ((e.target as HTMLElement).id === 'image-viewer-background') {
-//       closeViewer();
-//     }
-//   };
-
-//   return (
-//     <div
-//       id="image-viewer-background"
-//       onClick={handleBackgroundClick}
-//       className="fixed inset-0  bg-black bg-opacity-80 z-50 flex items-center justify-center   "
-//     >
-// <div className='max-h-[620px] max-w-[948px] relative flex justify-center items-center border-white border-8 rounded-[6px] '>
-//   {/* Close Button */}
-//   <button
-//   onClick={closeViewer}
-//   className="absolute -top-6 -right-6 text-[#6c757d] bg-white rounded-full w-10 h-10 flex items-center justify-center text-2xl z-[999]"
-// >
-//   &times;
-// </button>
-
-
-//   {/* Left Arrow Button */}
-//   <button
-//     onClick={goToPrevious}
-//     className="absolute -left-12 text-[#6c757d] text-3xl z-50 py-4 px-2  bg-white rounded-[6px] focus:outline-none  transition ease-in-out"
-//   >
-//     &#8592;
-//   </button>
-
-//   {/* Right Arrow Button */}
-//   <button
-//     onClick={goToNext}
-//     className="absolute -right-12 text-[#6c757d] text-3xl z-50 py-4 px-2 bg-white rounded-[6px] focus:outline-none  transition ease-in-out"
-//   >
-//     &#8594;
-//   </button>
-
-//   {/* Image */}
-//   <div className="relative w-full h-full flex flex-col justify-center items-center">
-//     <img
-//       src={images[currentIndex]}
-//       alt={`Image ${currentIndex + 1}`}
-//       className="w-full h-full max-h-[600px] max-w-[928px] object-contain rounded-lg"
-//     />
- 
-//   </div>
-// </div>
-
-   
-//     </div>
-//   );
-// };
-
-// export default ImageViewer;
-
-import React, { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { HiArrowLeft, HiArrowRight, HiX } from 'react-icons/hi';
+import EditorialImage from './EditorialImage';
+import type { GalleryImage } from './ImagesComponent';
 
 interface ImageViewerProps {
-  images: string[];
-  currentIndex: number;
-  closeViewer: () => void;
-  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+  image: GalleryImage;
+  position: number;
+  total: number;
+  onClose: () => void;
+  onMove: (offset: number) => void;
 }
 
-const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentIndex, closeViewer, setCurrentIndex }) => {
+export default function ImageViewer({ image, position, total, onClose, onMove }: ImageViewerProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden'; 
+    const dialog = dialogRef.current;
+    const previousOverflow = document.body.style.overflow;
+    dialog?.showModal();
+    document.body.style.overflow = 'hidden';
 
     return () => {
-      document.body.style.overflow = 'auto'; 
+      dialog?.close();
+      document.body.style.overflow = previousOverflow;
     };
   }, []);
 
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
-  };
-
-  const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if ((e.target as HTMLElement).id === 'image-viewer-background') {
-      closeViewer();
-    }
-  };
-
-
-  const handleCloseClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); 
-    closeViewer(); 
-  };
+  function dismiss() {
+    dialogRef.current?.close();
+    onClose();
+  }
 
   return (
-    <div
-      id="image-viewer-background"
-      onClick={handleBackgroundClick}
-      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[999]"
+    <dialog
+      ref={dialogRef}
+      className="viewer"
+      aria-label="Portrait viewer"
+      onClick={(event) => {
+        if (event.currentTarget === event.target) dismiss();
+      }}
+      onCancel={(event) => {
+        event.preventDefault();
+        dismiss();
+      }}
+      onKeyDown={(event) => {
+        if (total < 2) return;
+        if (event.key === 'ArrowLeft') onMove(-1);
+        if (event.key === 'ArrowRight') onMove(1);
+      }}
     >
-      <div className='max-h-[90vh] max-w-[80vw] relative  flex justify-center items-center border-white border-8 rounded-[6px]'>
-        {/* Close Button */}
-        <button
-          onClick={handleCloseClick} // Use the new handler
-          className="absolute -top-6 -right-6 text-[#6c757d] bg-white rounded-full w-10 h-10 flex items-center justify-center text-2xl z-[50]"
-        >
-          &times;
-        </button>
-
-        {/* Left Arrow Button */}
-        <button
-          onClick={goToPrevious}
-          className="absolute md:-left-12 -left-8 text-[#6c757d] text-3xl z-50 py-2 px-1 md:py-4 md:px-2  bg-white rounded-[6px] focus:outline-none transition ease-in-out"
-        >
-          &#8592;
-        </button>
-
-        {/* Right Arrow Button */}
-        <button
-          onClick={goToNext}
-          className="absolute md:-right-12 -right-8 text-[#6c757d] text-3xl z-50 py-2 px-1 md:py-4 md:px-2  bg-white rounded-[6px] focus:outline-none transition ease-in-out"
-        >
-          &#8594;
-        </button>
-
-        {/* Image */}
-        <div className="relative w-full h-full flex flex-col justify-center items-center">
-          <img
-            src={images[currentIndex]}
-            alt={`Image ${currentIndex + 1}`}
-            className="w-full h-full max-h-[80vh] max-w-[90vw] object-contain"
-          />
+      <div className="viewer-frame">
+        <div className="viewer-controls">
+          <p aria-live="polite">{position} / {total}</p>
+          <button className="viewer-button" type="button" aria-label="Close portrait viewer" onClick={dismiss}>
+            <HiX aria-hidden="true" />
+          </button>
         </div>
+        <figure>
+          <EditorialImage
+            src={image.url}
+            alt={image.title}
+            className="viewer-image"
+          />
+          <figcaption>
+            <p className="font-serif text-lg">{image.title}</p>
+            {image.description && <p>{image.description}</p>}
+          </figcaption>
+        </figure>
+        {total > 1 && (
+          <div className="viewer-controls">
+            <button className="viewer-button" type="button" aria-label="Previous portrait" onClick={() => onMove(-1)}><HiArrowLeft aria-hidden="true" /></button>
+            <button className="viewer-button" type="button" aria-label="Next portrait" onClick={() => onMove(1)}><HiArrowRight aria-hidden="true" /></button>
+          </div>
+        )}
       </div>
-    </div>
+    </dialog>
   );
-};
-
-export default ImageViewer;
-
+}

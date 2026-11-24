@@ -1,41 +1,77 @@
+import EditorialImage from './EditorialImage';
+import PageHeader from './PageHeader';
 import React from 'react';
 import { useAuthorContext } from '../hooks/AuthorContext';
+import { HiOutlineSparkles } from 'react-icons/hi';
 
-interface HonorsComponentProps{
-   title: string;
-   listData: string[];
-   imgUrl: string
+interface HonorsComponentProps {
+  title: string;
+  listData?: string[];
+  imgUrl?: string;
+  categoryBadge?: string;
+  status?: string;
 }
 
-const HonorsComponent:React.FC<HonorsComponentProps> = ({title, listData, imgUrl}) => {
-    const {authorName} = useAuthorContext();
-    return (
-        <section>
-            <div className='flex flex-col-reverse  gap-6 md:flex-row px-4 md:px-6 py-8'>
-                <div>
-                <span className='flex flex-col gap-2 pb-6 capitalize text-left font-bold text-white  border-b border-white'>
-            <h2 className='text-2xl'>about me</h2>
-            <h1 className='text-4xl'>{title}</h1>
-            
-          </span>
-          <ul className='pl-6 md:pl-8 pt-6'>
-            {
-                listData.map((listItem,i)=>
-                    <li key={i} className='text-white list-disc pl-2 leading-9'>{listItem}</li>
-                )
-            }
-    
-          </ul>
-                </div>
-    
-                <picture>
-                    <img src={imgUrl} className='md:max-w-[371px] md:max-h-[560px] ' 
-                        alt={`Portrait of ${authorName}`}
-                    />
-                </picture>
+const HonorsComponent: React.FC<HonorsComponentProps> = ({
+  title,
+  listData = [],
+  imgUrl,
+  categoryBadge = 'Honors & Distinctions',
+  status,
+}) => {
+  const { authorName } = useAuthorContext();
+  const displayName = authorName || 'Professor Mina Margaret Ogbanga';
+
+  return (
+    <section className="page-shell">
+      <div className="site-wrap">
+        {/* Header */}
+        <PageHeader
+          eyebrow={categoryBadge}
+          title={title}
+          description={`International fellowships, civic recognitions, and professional awards honoring ${displayName}.`}
+        />
+        {status && <p className="mb-6 text-muted" role="status">{status}</p>}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Portrait */}
+          {imgUrl && (
+            <div className="lg:col-span-5 space-y-4">
+              <div className="rounded overflow-hidden bg-paper border border-line">
+                <EditorialImage
+                  src={imgUrl}
+                  alt={`Portrait of ${displayName}`}
+                  loading="lazy"
+                  className="w-full h-auto object-cover max-h-[620px]"
+                />
+              </div>
             </div>
-        </section>
-      )
-}
+          )}
+
+          {/* Right Column: Structured Honor Cards */}
+          <div className={imgUrl ? 'lg:col-span-7 space-y-4 text-left' : 'lg:col-span-12 space-y-4 text-left'}>
+            <div className="space-y-3">
+              {listData.map((listItem, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3.5 p-4 surface-card"
+                >
+                  <div className="p-2 rounded-lg bg-gold-soft text-gold-ink border border-line flex-shrink-0 mt-0.5">
+                    <HiOutlineSparkles size={16} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-ink text-sm md:text-base leading-relaxed font-normal">
+                      {listItem}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export default HonorsComponent;

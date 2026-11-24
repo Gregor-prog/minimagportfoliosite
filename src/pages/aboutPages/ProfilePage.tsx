@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import EditorialImage from '../../components/EditorialImage';
+import PageHeader from '../../components/PageHeader';
+import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProfilePageHeroImage, fetchProfilePageText } from '../../../sanityApiClient/useSanityClient';
 import { useAuthorContext } from '../../hooks/AuthorContext';
@@ -36,12 +38,10 @@ interface ProfilePageData {
 }
 
 const fetchProfilePageData = async (): Promise<ProfilePageData> => {
-  const profilePageHeroImage = await fetchProfilePageHeroImage();
-  const profilePageText = await fetchProfilePageText();
-
-  if (!profilePageHeroImage || profilePageHeroImage.length === 0) {
-    throw new Error('Hero image not found');
-  }
+  const [profilePageText, profilePageHeroImage] = await Promise.all([
+    fetchProfilePageText(),
+    fetchProfilePageHeroImage().catch(() => []),
+  ]);
   if (!profilePageText || profilePageText.length === 0) {
     throw new Error('Profile Page text not found');
   }
@@ -51,93 +51,107 @@ const fetchProfilePageData = async (): Promise<ProfilePageData> => {
 
 const ProfilePage: React.FC = () => {
   const { authorName } = useAuthorContext();
-  const { data, isLoading } = useQuery<ProfilePageData>({
+  const displayName = authorName || 'Professor Mina Margaret Ogbanga';
+
+  const { data, isLoading, isError } = useQuery<ProfilePageData>({
     queryKey: ['profilePageData'],  
     queryFn: fetchProfilePageData,  
   });
-  
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [profileImgUrl, setProfileImgUrl] = useState('');
+
+  const heroAssetId = data?.profilePageHeroImage?.[0]?.image?.asset?._id;
+  const profileImgUrl = heroAssetId
+    ? urlFor(heroAssetId).width(1200).quality(85).format('webp').url()
+    : '';
+  const profileImgTablet = heroAssetId
+    ? urlFor(heroAssetId).width(768).quality(80).format('webp').url()
+    : '';
 
   useEffect(() => {
-    document.title = `Profile Page - ${authorName}`;
+    document.title = `Executive Biography & Profile - ${displayName}`;
+  }, [displayName]);
 
-    if (data) {
-      const profileUrl = urlFor(data.profilePageHeroImage[0].image.asset._id)
-        .width(1920)
-        .quality(80)
-        .format('webp')
-        .url();
-      setProfileImgUrl(profileUrl);
-
-      const profileImg = new Image();
-      profileImg.src = profileUrl;
-      profileImg.onload = () => {
-        setIsImageLoaded(true);
-      };
-    }
-  }, [data, authorName]);
-
-  if (isLoading || !isImageLoaded) {
+  if (isLoading) {
     return <WholePageSpinner />;
   }
 
   return (
-    <section className="flex flex-col gap-6 md:block md:w-[95%] mx-auto px-4 md:px-6 py-8 text">
-      <picture className="py-4 md:float-left md:mr-4">
-        <img
-          srcSet={`
-            ${profileImgUrl} 1920w,
-            ${urlFor(data?.profilePageHeroImage[0]?.image?.asset?._id)
-              .width(768)
-              .quality(80)
-              .format('webp')
-              .url()} 768w,
-            ${urlFor(data?.profilePageHeroImage[0]?.image?.asset?._id)
-              .width(480)
-              .quality(80)
-              .format('webp')
-              .url()} 480w
-          `}
-          sizes="(max-width: 480px) 480px, (max-width: 768px) 768px, 1920px"
-          src={profileImgUrl}
-          alt={`Portrait of ${authorName}`}
-          loading="lazy"
-          className="md:max-w-[380px] md:max-h-[560px]"
+    <section className="page-shell">
+      <div className="site-wrap">
+        {/* Academic Page Header */}
+        <PageHeader
+          eyebrow="Biography & Leadership"
+          title="Executive Profile"
+          description="First Professor of Social Work & Environmental Sustainability Globally • Acadapreneur • Ford Foundation Fellow"
         />
-      </picture>
+        {isError && <p className="mb-6 text-muted" role="status">The biography could not be loaded. Please try again later.</p>}
 
-      <div>
-        <span className="flex flex-col gap-2 pb-6 capitalize text-left font-bold text-white border-b border-white">
-          <h1 className="text-4xl">Profile</h1>
-        </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Portrait & Key Facts */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="rounded overflow-hidden bg-paper border border-line">
+              <EditorialImage
+                srcSet={`${profileImgUrl} 1200w, ${profileImgTablet} 768w`}
+                sizes="(max-width: 768px) 100vw, 40vw"
+                src={profileImgUrl}
+                alt={`Official portrait of ${displayName}`}
+                loading="eager"
+                className="w-full h-auto object-cover max-h-[620px]"
+              />
+            </div>
 
-        <div className="flex flex-col gap-8 pt-6 md:block">
-          {data?.profilePageText.map((paragraph) => (
-            <div key={paragraph._id} className="paragraph flex flex-col gap-8 md:block">
-              {paragraph.content.map((block) => (
-                <p key={block._key} className="text-white text-base font-normal leading-7 tracking-wide text-justify md:my-6">
-                  {block.children.map((child) => {
-                    const link = block.markDefs.find((def) => child.marks.includes(def._key));
-                    if (link) {
-                      return (
-                        <a
-                          key={child._key}
-                          href={link.href}
-                          target={link.openInNewTab ? '_blank' : '_self'}
-                          rel={link.openInNewTab ? 'noopener noreferrer' : undefined}
-                          className="text-[#49A3AC] hover:text-[#fd7e14]"
-                        >
-                          {child.text}
-                        </a>
-                      );
-                    }
-                    return <span key={child._key}>{child.text}</span>;
-                  })}
-                </p>
+            {/* Quick Credentials Card */}
+            <div className="p-5 rounded bg-paper border border-line text-left space-y-2 text-xs">
+              <p className="text-muted uppercase tracking-wider font-semibold text-[10px]">
+                Primary Affiliation
+              </p>
+              <p className="text-ink font-bold text-sm">
+                Rivers State University (RSU), Port Harcourt
+              </p>
+              <p className="text-muted">
+                Centre for Water and Sanitation Studies • Global Associate, IUPUI School of Social Work
+              </p>
+              <p className="text-muted">
+                Editor-in-Chief of the{' '}
+                <a className="text-link" href="https://www.ijsds.org/">
+                  International Journal of Social Work and Development Studies (IJSDS)
+                </a>
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column: Narrative Biography */}
+          <div className="lg:col-span-7 space-y-6 text-left">
+            <div className="surface-card p-6 md:p-8 space-y-6">
+              {data?.profilePageText.map((paragraph) => (
+                <div key={paragraph._id} className="space-y-4">
+                  {paragraph.content.map((block) => (
+                    <p
+                      key={block._key}
+                      className="text-ink text-base md:text-lg leading-relaxed font-sans font-normal"
+                    >
+                      {block.children.map((child) => {
+                        const link = block.markDefs.find((def) => child.marks.includes(def._key));
+                        if (link) {
+                          return (
+                            <a
+                              key={child._key}
+                              href={link.href}
+                              target={link.openInNewTab ? '_blank' : '_self'}
+                              rel={link.openInNewTab ? 'noopener noreferrer' : undefined}
+                              className="text-accent-strong hover:text-accent-strong underline font-semibold transition-colors"
+                            >
+                              {child.text}
+                            </a>
+                          );
+                        }
+                        return <span key={child._key}>{child.text}</span>;
+                      })}
+                    </p>
+                  ))}
+                </div>
               ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

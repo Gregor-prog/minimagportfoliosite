@@ -27,10 +27,10 @@ interface TextBooksData {
 }
 
 const fetchPeaceAndSecurityData = async (): Promise<TextBooksData> => {
-  const TextBooksImageWritingsData = await fetchTextBooksImageWritingsLinks();
-  const TextBooksWritingsData = await fetchTextBooksWritingsLinks();
- console.log(TextBooksImageWritingsData);
- console.log(TextBooksWritingsData);
+  const [TextBooksImageWritingsData, TextBooksWritingsData] = await Promise.all([
+    fetchTextBooksImageWritingsLinks(),
+    fetchTextBooksWritingsLinks(),
+  ]);
   return { TextBooksImageWritingsData, TextBooksWritingsData };
 };
 
@@ -41,7 +41,7 @@ const TextBooksPage: React.FC = () => {
     document.title = `Textbooks - ${authorName}`;
   }, [authorName]);
 
-  const { data } = useQuery<TextBooksData>({
+  const { data, isLoading, isError } = useQuery<TextBooksData>({
     queryKey: ['peaceAndSecurityData'], 
     queryFn: fetchPeaceAndSecurityData, 
   });
@@ -49,19 +49,12 @@ const TextBooksPage: React.FC = () => {
   
 
   return (
-    <section>
-      <div className='md:w-[85%] mx-auto px-4 md:px-6 py-8'>
-        <div>
-          {data && (
-            <WritingsComponent
-              booksData={data?.TextBooksImageWritingsData} 
-              linksData={data?.TextBooksWritingsData[0].items}
-              title={'Textbooks'}
-            />
-          )}
-        </div>
-      </div>
-    </section>
+    <WritingsComponent
+      title="Textbooks"
+      booksData={data?.TextBooksImageWritingsData || []}
+      linksData={data?.TextBooksWritingsData?.[0]?.items || []}
+      status={isLoading ? "Loading entries…" : isError ? "Entries could not be loaded. Please try again later." : undefined}
+    />
   );
 };
 

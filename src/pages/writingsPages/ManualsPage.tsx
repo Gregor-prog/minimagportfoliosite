@@ -27,8 +27,10 @@ interface ManualsData {
 }
 
 const fetchManualsData = async (): Promise<ManualsData> => {
- const manualsImageWritingsData = await fetchManualsImageWritingsLinks();
- const manualsWritingsData = await fetchManualsWritingsLinks();
+  const [manualsImageWritingsData, manualsWritingsData] = await Promise.all([
+    fetchManualsImageWritingsLinks(),
+    fetchManualsWritingsLinks(),
+  ]);
  
   return { manualsImageWritingsData, manualsWritingsData};
 };
@@ -40,30 +42,19 @@ const ManualsPage: React.FC = () => {
     document.title = `Manuals - ${authorName}`;
   }, [authorName]);
 
-  const { data } = useQuery<ManualsData>({
+  const { data, isLoading, isError } = useQuery<ManualsData>({
     queryKey: ['manualsData'],
     queryFn: fetchManualsData,
   });
 
 
   return (
-    <section>
-      <div className='md:w-[85%] mx-auto px-4 md:px-6 py-8'>
-        <div>
-          {
-            data && (
-              <WritingsComponent 
-                booksData={data?.manualsImageWritingsData} //Naming wan wound me at this point
-                linksData={data?.manualsWritingsData[0].items} 
-                title={'Manuals'} 
-                />
-
-            )
-
-          }
-        </div>
-      </div>
-    </section>
+    <WritingsComponent
+      title="Manuals"
+      booksData={data?.manualsImageWritingsData || []}
+      linksData={data?.manualsWritingsData?.[0]?.items || []}
+      status={isLoading ? "Loading entries…" : isError ? "Entries could not be loaded. Please try again later." : undefined}
+    />
   );
 }
 

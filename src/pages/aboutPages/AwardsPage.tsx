@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import HonorsComponent from "../../components/HonorsComponent";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -34,69 +34,47 @@ interface AwardsPageData {
 // Main component
 const AwardsPage: React.FC = () => {
   const fetchAwardsPageData = async (): Promise<AwardsPageData> => {
-    const awardsPageInput = await fetchAwardsPageInput();
-    const awardsPageHeroImage = await fetchAwardsPageHeroImage();
+    const [awardsPageInput, awardsPageHeroImage] = await Promise.all([
+      fetchAwardsPageInput(),
+      fetchAwardsPageHeroImage().catch(() => []),
+    ]);
 
     if (!awardsPageInput || awardsPageInput.length === 0) {
       throw new Error("Awards Page input not found");
-    }
-    if (!awardsPageHeroImage || awardsPageHeroImage.length === 0) {
-      throw new Error("Hero image not found");
     }
 
     return { awardsPageInput, awardsPageHeroImage };
   };
 
-  const { data, isLoading } = useQuery<AwardsPageData>({
+  const { data, isLoading, isError } = useQuery<AwardsPageData>({
     queryKey: ["awardsPageData"], // Updated the query key to match the correct data
     queryFn: fetchAwardsPageData,
   });
 
   const { authorName } = useAuthorContext();
+  const displayName = authorName || 'Professor Mina Margaret Ogbanga';
 
-  const [awardsPageHeroImageUrl, setAwardsPageHeroImageUrl] = useState("");
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const heroAssetId = data?.awardsPageHeroImage?.[0]?.image?.asset?._id;
+  const awardsPageHeroImageUrl = heroAssetId
+    ? urlFor(heroAssetId).width(1200).quality(85).format("webp").url()
+    : "";
 
   useEffect(() => {
-    document.title = `Awards And Scholarships - ${authorName}`;
+    document.title = `Awards & Recognitions - ${displayName}`;
+  }, [displayName]);
 
-    if (data?.awardsPageHeroImage && data.awardsPageHeroImage.length > 0) {
-      const img = new Image();
-      const imgUrl = urlFor(data.awardsPageHeroImage[0].image.asset._id)
-        .width(1920)
-        .quality(80)
-        .format("webp")
-        .url();
-
-      img.src = imgUrl;
-
-      img.onload = () => {
-        setAwardsPageHeroImageUrl(imgUrl);
-        setIsImageLoaded(true);
-      };
-
-      return () => {
-        img.onload = null;
-      };
-    }
-  }, [authorName, data]);
-
-  if (isLoading || !isImageLoaded) {
+  if (isLoading) {
     return <WholePageSpinner />;
   }
 
   return (
-    <section>
-      <div className="md:w-[85%] mx-auto px-4 md:px-6 py-8">
-        {data && (
-          <HonorsComponent
-            title={"Awards and Recognitions"}
-            imgUrl={awardsPageHeroImageUrl}
-            listData={data.awardsPageInput[0]?.details}
-          />
-        )}
-      </div>
-    </section>
+    <HonorsComponent
+      title="Awards and Recognitions"
+      imgUrl={awardsPageHeroImageUrl}
+      listData={data?.awardsPageInput[0]?.details || []}
+      categoryBadge="Distinctions & Accolades"
+      status={isError ? "Awards could not be loaded. Please try again later." : undefined}
+    />
   );
 };
 

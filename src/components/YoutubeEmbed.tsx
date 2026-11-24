@@ -1,20 +1,19 @@
-import React from 'react'
-
-interface YoutubeEmbedProps{
-    videoUrl:string;
+interface YoutubeEmbedProps {
+  videoUrl: string;
+  title: string;
 }
-const YoutubeEmbed:React.FC<YoutubeEmbedProps> = ({ videoUrl }) => {
+
+export default function YoutubeEmbed({ videoUrl, title }: YoutubeEmbedProps) {
   return (
-    <div className="max-w-[400px] max-h-[300px] overflow-hidden">
+    <div className="surface-card aspect-video overflow-hidden">
       <iframe
-        className="w-full h-full"
+        className="h-full w-full"
         src={videoUrl}
+        loading="lazy"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        title="YouTube video player"
-      ></iframe>
+        title={title}
+      />
     </div>
   );
-};
-
-export default YoutubeEmbed;
+}

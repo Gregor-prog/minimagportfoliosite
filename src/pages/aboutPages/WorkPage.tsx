@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import EditorialImage from '../../components/EditorialImage';
+import PageHeader from '../../components/PageHeader';
+import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchWorkPageInput } from '../../../sanityApiClient/useSanityClient';
 import { useAuthorContext } from '../../hooks/AuthorContext';
@@ -20,6 +22,7 @@ interface WorkPageHeading {
 }
 
 interface WorkPageResponse {
+  _id: string;
   heading: WorkPageHeading[];
   description: string;
   image: WorkPageImage;
@@ -35,94 +38,87 @@ const fetchWorkPageData = async () => {
 
 const WorkPage: React.FC = () => {
   const { authorName } = useAuthorContext();
+  const displayName = authorName || 'Professor Mina Margaret Ogbanga';
   
-  const { data, isLoading } = useQuery({
+  const { data = [], isLoading, isError } = useQuery<WorkPageResponse[]>({
     queryKey: ['workPageData'],
     queryFn: fetchWorkPageData,
     staleTime: 0,
   });
 
-  const [isImagesLoaded, setIsImagesLoaded] = useState(false);
-  const [preloadedImages, setPreloadedImages] = useState<string[]>([]);
-
   useEffect(() => {
-    document.title = `My Work - ${authorName}`;
-    
-    if (data) {
-      const imageUrls = data.map((item: WorkPageResponse) => 
-        urlFor(item.image.asset._id).width(1920).quality(80).format('webp').url()
-      );
+    document.title = `Professional Impact & Work - ${displayName}`;
+  }, [displayName]);
 
-      const preloadImages = (srcArray: string[], callback: () => void) => {
-        let loadedCount = 0;
-        srcArray.forEach((src) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = () => {
-            loadedCount += 1;
-            if (loadedCount === srcArray.length) {
-              callback();
-            }
-          };
-        });
-      };
-
-      preloadImages(imageUrls, () => {
-        setPreloadedImages(imageUrls);
-        setIsImagesLoaded(true);
-      });
-    }
-  }, [data, authorName]);
-
-  if (isLoading || !isImagesLoaded) {
+  if (isLoading) {
     return <WholePageSpinner />;
   }
 
   return (
-    <section>
-      <div className='flex flex-col justify-center px-4 md:px-6 py-8'>
-        <div className='max-w-[680px] md:pl-8 lg:pl-12 py-12'>
-          <span className='flex flex-col gap-2 pb-6 capitalize text-left font-bold text-white border-b border-white'>
-            <h2 className='text-2xl'>About Me</h2>
-            <h1 className='text-4xl'>My Work</h1>
-          </span>
+    <section className="page-shell">
+      <div className="site-wrap">
+        {/* Header */}
+        <PageHeader
+          eyebrow="Community & Sectoral Impact"
+          title="Professional Work & Initiatives"
+          description="Advancing community empowerment, environmental restoration, WASH infrastructure, and sustainable development across Nigeria and globally."
+        />
+        {isError && <p className="mb-6 text-muted" role="status">Work entries could not be loaded. Please try again later.</p>}
 
-          <div className="flex flex-col gap-4">
-            {data.map((ele: WorkPageResponse, index: number) => (
-              <div key={ele.image.asset._id} className="flex flex-col md:flex-row gap-4 items-start pt-4">
-                <img
-                  src={preloadedImages[index]} // Use preloaded image URL
-                  className="w-full md:w-[153px] md:h-[132px] max-w-[100%] object-contain"
-                  alt={ele.description} // Use description as alt text
-                />
-                <div className="flex flex-col justify-start md:justify-between">
-                  {ele.heading.map((headingItem) => {
-                    const linkDef = headingItem.markDefs[0];
-                    const content = headingItem.children[0]?.text;
+        {/* Initiatives List */}
+        <div className="space-y-6 text-left">
+          {data.map((ele: WorkPageResponse) => {
+            const imgUrl = ele.image?.asset?._id
+              ? urlFor(ele.image.asset._id).width(600).quality(85).format('webp').url()
+              : '';
 
-                    return linkDef && linkDef.href ? (
-                      <a
-                        key={headingItem._key}
-                        href={linkDef.href}
-                        className="font-bold underline text-blue-500 py-0"
-                        target={linkDef.openInNewTab ? '_blank' : '_self'}
-                        rel={linkDef.openInNewTab ? 'noopener noreferrer' : undefined}
-                      >
-                        {content}
-                      </a>
-                    ) : (
-                      <h2 key={headingItem._key} className="font-bold text-2xl text-white">
-                        {content}
-                      </h2>
-                    );
-                  })}
+            return (
+              <div
+                key={ele._id}
+                className="flex flex-col md:flex-row gap-6 p-6 surface-card"
+              >
+                {imgUrl && (
+                  <div className="w-full md:w-56 h-40 md:h-auto flex-shrink-0 rounded-xl overflow-hidden bg-cream flex items-center justify-center p-2 border border-line">
+                    <EditorialImage
+                      src={imgUrl}
+                      className="w-full h-full object-contain"
+                      alt=""
+                      loading="lazy"
+                    />
+                  </div>
+                )}
 
-                  <p className="text-white leading-6">{ele.description}</p>
+                <div className="flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    {ele.heading?.map((headingItem) => {
+                      const linkDef = headingItem.markDefs?.[0];
+                      const content = headingItem.children?.[0]?.text;
+
+                      return linkDef && linkDef.href ? (
+                        <a
+                          key={headingItem._key}
+                          href={linkDef.href}
+                          className="font-bold font-serif text-xl md:text-2xl text-accent-strong hover:text-accent-strong underline block mb-2"
+                          target={linkDef.openInNewTab ? '_blank' : '_self'}
+                          rel={linkDef.openInNewTab ? 'noopener noreferrer' : undefined}
+                        >
+                          {content}
+                        </a>
+                      ) : (
+                        <h2 key={headingItem._key} className="font-bold font-serif text-xl md:text-2xl text-ink mb-2">
+                          {content}
+                        </h2>
+                      );
+                    })}
+
+                    <p className="text-muted text-sm md:text-base leading-relaxed">
+                      {ele.description}
+                    </p>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-
+            );
+          })}
         </div>
       </div>
     </section>

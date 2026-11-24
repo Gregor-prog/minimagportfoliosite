@@ -38,7 +38,7 @@ export const fetchProfilePageText = async () => {
 
 
 export const fetchWorkPageInput = async () => {
-  const query = `*[_type == "WorkPageInput"]{heading, description, image { asset -> { _id, } }}`;
+  const query = `*[_type == "WorkPageInput"]{_id, heading, description, image { asset -> { _id, } }}`;
   const data = await sanityClient.fetch(query);
   return data;
 };
@@ -128,7 +128,12 @@ export const fetchPapersWritingsLinks = async () => {
   const query = `*[_type == "PapersWritingsLinks"]{
   items[]{
     title,
-    url
+    url,
+    authors,
+    year,
+    journal,
+    category,
+    doi
   }
 }`;
   const data = await sanityClient.fetch(query);
