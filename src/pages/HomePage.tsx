@@ -83,6 +83,7 @@ export default function HomePage() {
       <div className="credentials-strip">
         <ul className="site-wrap">
           <li>Ford Foundation Fellow</li>
+          <li><a className="underline underline-offset-4" href="https://www.ashoka.org/en-us/fellow/mina-ogbanga">Ashoka Fellow</a></li>
           <li>Rivers State University</li>
           <li>Global Associate · IUPUI</li>
         </ul>

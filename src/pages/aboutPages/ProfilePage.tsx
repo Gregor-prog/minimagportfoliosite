@@ -101,6 +101,7 @@ const ProfilePage: React.FC = () => {
 
             {/* Quick Credentials Card */}
             <div className="p-5 rounded bg-paper border border-line text-left space-y-2 text-xs">
+              <p><a className="text-link" href="https://www.ashoka.org/en-us/fellow/mina-ogbanga">Ashoka Fellow since September 2024</a></p>
               <p className="text-muted uppercase tracking-wider font-semibold text-[10px]">
                 Primary Affiliation
               </p>

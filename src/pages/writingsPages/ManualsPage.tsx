@@ -51,6 +51,7 @@ const ManualsPage: React.FC = () => {
   return (
     <WritingsComponent
       title="Manuals"
+      emptyMessage="Manuals are coming soon."
       booksData={data?.manualsImageWritingsData || []}
       linksData={data?.manualsWritingsData?.[0]?.items || []}
       status={isLoading ? "Loading entries…" : isError ? "Entries could not be loaded. Please try again later." : undefined}

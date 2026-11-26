@@ -66,7 +66,7 @@ const FellowShipScholarshipPage: React.FC = () => {
         <PageHeader
           eyebrow="International Fellowships & Endowments"
           title="Fellowships & Scholarships"
-          description={`Ford Foundation Fellowships and distinguished academic research grants awarded to ${displayName}.`}
+          description={`Ashoka and Ford Foundation fellowships and academic research grants awarded to ${displayName}.`}
         />
         {isError && <p className="mb-6 text-muted" role="status">Fellowship details could not be loaded. Please try again later.</p>}
 
@@ -88,6 +88,11 @@ const FellowShipScholarshipPage: React.FC = () => {
           {/* Right Column: Fellowships List */}
           <div className={fellowshipsHeroImageUrl ? 'lg:col-span-7 space-y-6 text-left' : 'lg:col-span-12 space-y-6 text-left'}>
             <div className="space-y-6">
+              <div className="p-6 rounded bg-paper border border-line space-y-2">
+                <h2 className="text-xl">Ashoka Fellowship</h2>
+                <p>Elected in September 2024 for her work advancing extractive justice in Nigeria.</p>
+                <a className="text-link" href="https://www.ashoka.org/en-us/fellow/mina-ogbanga">Read her Ashoka Fellow profile</a>
+              </div>
               {data?.fellowshipsAndScholarshipsInput.map((fellowship) => (
                 <div
                   key={fellowship._id}
