@@ -91,7 +91,7 @@ export const  fetchFellowshipsAndRecognitionsPageInput = async () => {
 
 
 export const fetchManualsImageWritingsLinks = async () => {
-  const query = `*[_type == "ManualsImageWritingsLinks"]{title, url , image { asset -> { _id} }}`;
+  const query = `*[_type == "ManualsImageWritingsLinks"] | order(_createdAt desc){title, url, purchaseAvailable, image { asset -> { _id } }}`;
   const data = await sanityClient.fetch(query);
   return data;
 };
@@ -144,7 +144,7 @@ export const fetchPapersWritingsLinks = async () => {
 
 
 export const fetchTextBooksImageWritingsLinks = async () => {
-  const query = `*[_type == "TextbooksImageWritingsLinks"]{title, url , image { asset -> { _id, url } }}`;
+  const query = `*[_type == "TextbooksImageWritingsLinks"] | order(_createdAt desc){title, url, purchaseAvailable, image { asset -> { _id } }}`;
   const data = await sanityClient.fetch(query);
   return data;
 };

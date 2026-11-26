@@ -21,8 +21,14 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'purchaseAvailable',
+      title: 'Purchase available',
+      description: 'Set this after checking the public product page. Leave it blank if availability has not been checked.',
+      type: 'boolean',
+    }),
+    defineField({
       name: 'url',
-      title: 'URL',
+      title: 'Product or resource URL',
       type: 'url',
       validation: (Rule) => Rule.required().uri({ scheme: ['http', 'https'] }),
     }),
